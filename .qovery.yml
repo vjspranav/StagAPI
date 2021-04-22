@@ -3,10 +3,6 @@ application:
   name: "stagapi"
   project: "StagAPI"
   organization: "QoveryCommunity"
-databases:
-- type: "MONGODB"
-  name: "stagos_official"
-  version: "4.4"
 routers:
 - name: "main-stagapi"
   custom_domains:
