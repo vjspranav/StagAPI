@@ -10,7 +10,7 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const DB_NAME = "TestReport";
 let mongouri = process.env.QOVERY_DATABASE_STAGOS_OFFICIAL_CONNECTION_URI;
-
+//mongouri = mongouri.split("/admin")[0];
 // Connect to moongose
 // Connection to MongoDB
 mongoose.connect(mongouri + "/" + DB_NAME, {

@@ -3,21 +3,25 @@ const Schema = mongoose.Schema;
 
 // Create Schema
 const DownloadsSchema = new Schema({
-  onedriveDownload: {
+  onedriveDownloads: {
     type: Number,
-    required: True,
+    required: true,
   },
-  sfgDownload: {
+  sfgDownloads: {
     type: Number,
-    required: True,
+    required: true,
   },
   gapps: {
     type: Number,
-    required: True,
+    required: true,
   },
   pristine: {
     type: Number,
-    required: True,
+    required: true,
+  },
+  device: {
+    type: String,
+    required: true,
   },
 });
 
