@@ -9,6 +9,9 @@ databases:
   version: "4.4"
 routers:
 - name: "main-stagapi"
+  custom_domains:
+  - branch: main
+    domain: api.stag-os.org
   routes:
   - application_name: "stagapi"
     paths:
