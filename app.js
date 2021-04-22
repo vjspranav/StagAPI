@@ -4,6 +4,26 @@ var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 
+// For Mongo
+const bodyParser = require("body-parser");
+//const cors = require("cors");
+const mongoose = require("mongoose");
+const PORT = 4000;
+const DB_NAME = "TestReport";
+let mongouri = process.env.QOVERY_DATABASE_STAGOS_OFFICIAL_CONNECTION_URI;
+
+// Connect to moongose
+// Connection to MongoDB
+mongoose.connect(mongouri + DB_NAME, {
+  useNewUrlParser: true,
+});
+const connection = mongoose.connection;
+connection.once("open", function () {
+  console.log(
+    `MongoDB database connection to db ${DB_NAME} established successfully !`
+  );
+});
+
 var indexRouter = require("./routes/index");
 var downloadsRouter = require("./routes/downloads");
 var updatesRouter = require("./routes/updates");
