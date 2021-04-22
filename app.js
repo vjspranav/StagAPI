@@ -8,12 +8,11 @@ var logger = require("morgan");
 const bodyParser = require("body-parser");
 //const cors = require("cors");
 const mongoose = require("mongoose");
-//const DB_NAME = "TestReport";
-let mongouri = process.env.QOVERY_DATABASE_STAGOS_OFFICIAL_CONNECTION_URI;
-//mongouri = mongouri.split("/admin")[0];
+const DB_NAME = "StagOfficial";
+let mongouri = process.env.ATLAS_URI;
 // Connect to moongose
 // Connection to MongoDB
-mongoose.connect(mongouri, {
+mongoose.connect(mongouri + "/" + DB_NAME, {
   useNewUrlParser: true,
 });
 const connection = mongoose.connection;
