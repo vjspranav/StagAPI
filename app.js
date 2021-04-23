@@ -16,7 +16,7 @@ try {
   console.log(dbconfig);
 } catch (ex) {
   dbconfig = {
-    mongouri: process.env.ATLAS,
+    mongouri: process.env.ATLAS_URI,
   };
 }
 console.log(dbconfig);
