@@ -13,15 +13,12 @@ const DB_NAME = "StagOfficial";
 let dbconfig = {};
 try {
   dbconfig = require("./keys/prod.js");
-  console.log(dbconfig);
 } catch (ex) {
   dbconfig = {
     mongouri: process.env.ATLAS_URI,
   };
 }
-console.log(dbconfig);
 let mongouri = dbconfig.mongouri;
-console.log(mongouri);
 // Connect to moongose
 // Connection to MongoDB
 mongoose.connect(mongouri + "/" + DB_NAME, {
