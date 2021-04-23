@@ -8,8 +8,20 @@ var logger = require("morgan");
 const bodyParser = require("body-parser");
 //const cors = require("cors");
 const mongoose = require("mongoose");
+
 const DB_NAME = "StagOfficial";
-let mongouri = process.env.ATLAS_URI;
+let dbconfig = {};
+try {
+  dbconfig = require("./keys/prod.js");
+  console.log(dbconfig);
+} catch (ex) {
+  dbconfig = {
+    mongouri: process.env.ATLAS,
+  };
+}
+console.log(dbconfig);
+let mongouri = dbconfig.mongouri;
+console.log(mongouri);
 // Connect to moongose
 // Connection to MongoDB
 mongoose.connect(mongouri + "/" + DB_NAME, {
