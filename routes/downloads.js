@@ -105,24 +105,24 @@ let getfileNames = async (device) => {
 
 /* GET users listing. */
 router.get("/:device/:variant", async (req, res, next) => {
-  console.log("Here 1");
+  //console.log("Here 1");
   let variant = req.params.variant;
   let vs = { gapps: 0, pristine: 1 };
   let link = "https://releases.stag-os.workers.dev/" + req.params.device;
   let devices = await getDevices();
-  console.log("Here 2");
+  //console.log("Here 2");
   if (!devices.includes(req.params.device)) {
     sendJson(res, { Message: "Invalid device name or unsupported device" });
     return;
   }
-  console.log("Here 3");
+  //console.log("Here 3");
   if (variant != "gapps" && variant != "pristine") {
     sendJson(res, {
       Message: "Invalid variant, please select only prisitne or gapps",
     });
     return;
   }
-  console.log("Here 4");
+  //console.log("Here 4");
   let files = await getfileNames(req.params.device);
   if (files) {
     //console.log(files);
