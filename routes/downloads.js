@@ -97,7 +97,7 @@ let getfileNames = async (device) => {
         return null;
       if (x[0].includes("Pristine") && x[1].includes("GApps"))
         return [x[1], x[0]];
-      if (x[0].includes("GApps") && x[1].includes("Pristine"))
+      else if (x[0].includes("GApps") && x[1].includes("Pristine"))
         return [x[0], x[1]];
       return null;
     });
@@ -105,41 +105,48 @@ let getfileNames = async (device) => {
 
 /* GET users listing. */
 router.get("/:device/:variant", async (req, res, next) => {
+  console.log("Here 1");
   let variant = req.params.variant;
   let vs = { gapps: 0, pristine: 1 };
   let link = "https://releases.stag-os.workers.dev/" + req.params.device;
   let devices = await getDevices();
+  console.log("Here 2");
   if (!devices.includes(req.params.device)) {
     sendJson(res, { Message: "Invalid device name or unsupported device" });
     return;
   }
+  console.log("Here 3");
   if (variant != "gapps" && variant != "pristine") {
     sendJson(res, {
       Message: "Invalid variant, please select only prisitne or gapps",
     });
     return;
   }
+  console.log("Here 4");
   let files = await getfileNames(req.params.device);
   if (files) {
     //console.log(files);
-    const exists = await urlExist(link + "/" + files[vs[variant]]);
-    if (!exists) {
-      let sfg =
-        "https://api.stag-os.org/downloads/sourceforge/" +
-        req.params.device +
-        "/" +
-        variant;
+    // const exists = await urlExist(link + "/" + files[vs[variant]]);
+    // if (!exists) {
+    //   let sfg =
+    //     "https://api.stag-os.org/downloads/sourceforge/" +
+    //     req.params.device +
+    //     "/" +
+    //     variant;
 
-      sendJson(res, {
-        Message: "File not found in mirror",
-        "Possible Solution": "Try using the sourceforge link",
-        sfg: sfg,
-      });
-    } else {
-      updateDownloads("od", vs[variant], req.params.device);
-      res.redirect(link + "/" + files[vs[variant]]);
-    }
+    //   sendJson(res, {
+    //     Message: "File not found in mirror",
+    //     "Possible Solution": "Try using the sourceforge link",
+    //     sfg: sfg,
+    //   });
+    //   console.log("Here 5");
+    // } else {
+    updateDownloads("od", vs[variant], req.params.device);
+    res.redirect(link + "/" + files[vs[variant]]);
+    console.log("Here 5.1");
+    //}
   }
+  console.log("Here 6");
   if (!files) {
     sendJson(res, {
       Message: "Files not found, Please Notify in main group",
