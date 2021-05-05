@@ -229,4 +229,30 @@ router.get("/show", async (req, res, next) => {
   sendJson(res, json);
 });
 
+/* GET users listing. */
+router.get("/show/stats/:device", async (req, res, next) => {
+  let dow = {};
+  let device = req.params.device;
+  let gappsTotal = 0;
+  let pristineTotal = 0;
+  let objects = await Downloads.find({});
+  for (i in objects) {
+    if (objects[i].device == device) {
+      let json = {
+        device: device,
+        gapps: objects[i].gapps ? objects[i].gapps : 0,
+        pristine: objects[i].pristine ? objects[i].pristine : 0,
+      };
+      sendJson(res, json);
+      return;
+    }
+  }
+  let json = {
+    device: device,
+    gapps: 0,
+    pristine: 0,
+  };
+  sendJson(res, json);
+});
+
 module.exports = router;
