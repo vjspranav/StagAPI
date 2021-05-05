@@ -238,19 +238,14 @@ router.get("/show/stats/:device", async (req, res, next) => {
   let objects = await Downloads.find({});
   for (i in objects) {
     if (objects[i].device == device) {
-      let json = {
-        device: device,
-        gapps: objects[i].gapps ? objects[i].gapps : 0,
-        pristine: objects[i].pristine ? objects[i].pristine : 0,
-      };
-      sendJson(res, json);
-      return;
+      gappsTotal += objects[i].gapps;
+      pristineTotal += objects[i].pristine;
     }
   }
   let json = {
     device: device,
-    gapps: 0,
-    pristine: 0,
+    gapps: gappsTotal,
+    pristine: pristineTotal,
   };
   sendJson(res, json);
 });
