@@ -250,4 +250,14 @@ router.get("/show/stats/:device", async (req, res, next) => {
   sendJson(res, json);
 });
 
+/* GET users listing. */
+router.get("/getFile/name/:device", async (req, res, next) => {
+  let device = req.params.device;
+  let files = await getfileNames(device);
+  let json = {
+    gapps: files[0],
+    pristine: files[1],
+  };
+  sendJson(res, json);
+});
 module.exports = router;
