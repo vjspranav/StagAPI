@@ -264,6 +264,9 @@ router.get("/stats/:device", async (req, res, next) => {
         return prev + cur.onedriveDownloads;
       }, 0);
       downloads += total;
+    })
+    .catch(() => {
+      console.log("Error");
     });
   sendJson(res, { downloads, date: date });
 });
