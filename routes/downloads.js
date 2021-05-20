@@ -62,49 +62,80 @@ let getDevices = async () => {
     });
 };
 
+// let getfileNames = async (device) => {
+// let url = "https://sourceforge.net/projects/stagos-11/files/" + device + "/";
+// return fetch(url, { method: "Get" })
+//   .then((res) => res.text())
+//   .then((text) => {
+//     let jspn = text.split("<script>");
+//     let data = {};
+//     for (i in jspn) {
+//       if (jspn[i].includes("net.sf.files")) {
+//         data = jspn[i];
+//       }
+//     }
+//     data = data.split(";")[0];
+//     data = data.split("net.sf.files =")[1];
+//     // preserve newlines, etc - use valid JSON
+//     data = data
+//       .replace(/\\n/g, "\\n")
+//       .replace(/\\'/g, "\\'")
+//       .replace(/\\"/g, '\\"')
+//       .replace(/\\&/g, "\\&")
+//       .replace(/\\r/g, "\\r")
+//       .replace(/\\t/g, "\\t")
+//       .replace(/\\b/g, "\\b")
+//       .replace(/\\f/g, "\\f");
+//     // remove non-printable and other non-valid JSON chars
+//     data = data.replace(/[\u0000-\u0019]+/g, "");
+//     data = JSON.parse(data);
+//       let x = Object.keys(data);
+//       if (
+//         x[0].split(device)[1].split("OFFICIAL")[0] !=
+//         x[1].split(device)[1].split("OFFICIAL")[0]
+//       )
+//         return null;
+//       if (x[0].includes("Pristine") && x[1].includes("GApps"))
+//         return [x[1], x[0]];
+//       else if (x[0].includes("GApps") && x[1].includes("Pristine"))
+//         return [x[0], x[1]];
+//       return null;
+//     });
+// };
+
 let getfileNames = async (device) => {
-  let url = "https://sourceforge.net/projects/stagos-11/files/" + device + "/";
-  return fetch(url, { method: "Get" })
-    .then((res) => res.text())
-    .then((text) => {
-      let jspn = text.split("<script>");
-      let data = {};
-      for (i in jspn) {
-        if (jspn[i].includes("net.sf.files")) {
-          data = jspn[i];
-        }
-      }
-      data = data.split(";")[0];
-      data = data.split("net.sf.files =")[1];
-      // preserve newlines, etc - use valid JSON
-      data = data
-        .replace(/\\n/g, "\\n")
-        .replace(/\\'/g, "\\'")
-        .replace(/\\"/g, '\\"')
-        .replace(/\\&/g, "\\&")
-        .replace(/\\r/g, "\\r")
-        .replace(/\\t/g, "\\t")
-        .replace(/\\b/g, "\\b")
-        .replace(/\\f/g, "\\f");
-      // remove non-printable and other non-valid JSON chars
-      data = data.replace(/[\u0000-\u0019]+/g, "");
-      data = JSON.parse(data);
-      let x = Object.keys(data);
-      if (
-        x[0].split(device)[1].split("OFFICIAL")[0] !=
-        x[1].split(device)[1].split("OFFICIAL")[0]
-      )
-        return null;
-      if (x[0].includes("Pristine") && x[1].includes("GApps"))
-        return [x[1], x[0]];
-      else if (x[0].includes("GApps") && x[1].includes("Pristine"))
-        return [x[0], x[1]];
-      return null;
+  let gapps = "";
+  let pristine = "";
+  let url =
+    "https://raw.githubusercontent.com/StagOS-Devices/OTA/r11/" + device;
+  await fetch(url + "/gapps.json", { method: "Get" })
+    .then((res, err) => res.json())
+    .then(async (json, err) => {
+      gapps = json.response[0].filename;
+      await fetch(url + "/pristine.json", { method: "Get" })
+        .then((res, err) => res.json())
+        .then((json, err) => {
+          pristine = json.response[0].filename;
+          // console.log(gapps, pristine);
+        })
+        .catch(() => {
+          return -1;
+        });
+    })
+    .catch(() => {
+      return -1;
     });
+  if (gapps && pristine) return { gapps, pristine };
+  return { error: "Not Found" };
 };
 
 /* GET users listing. */
-router.get("/:device/:variant", async (req, res, next) => {
+router.get("/", async (req, res, next) => {
+  res.redirect("https://downloads.stag-os.org");
+});
+
+/* GET users listing. */
+router.get("/ota/:device/:variant", async (req, res, next) => {
   //console.log("Here 1");
   let variant = req.params.variant;
   let vs = { gapps: 0, pristine: 1 };
@@ -142,11 +173,9 @@ router.get("/:device/:variant", async (req, res, next) => {
     //   console.log("Here 5");
     // } else {
     updateDownloads("od", vs[variant], req.params.device);
-    res.redirect(link + "/" + files[vs[variant]]);
-    console.log("Here 5.1");
+    res.redirect(link + "/" + files[variant]);
     //}
   }
-  console.log("Here 6");
   if (!files) {
     sendJson(res, {
       Message: "Files not found, Please Notify in main group",
@@ -180,7 +209,7 @@ router.get("/sourceforge/:device/:variant", async (req, res, next) => {
     });
   } else {
     updateDownloads("sfg", vs[variant], req.params.device);
-    res.redirect(link + "/" + files[vs[variant]]);
+    res.redirect(link + "/" + files[variant]);
   }
 });
 
@@ -189,6 +218,50 @@ router.get("/showraw", async (req, res, next) => {
   let objects = await Downloads.find({});
   console.log(objects);
   res.send(objects);
+});
+
+/* GET raw statistics listing. */
+router.get("/stats/:device", async (req, res, next) => {
+  let downloads = 0;
+  let url =
+    "https://sourceforge.net/projects/stagos-11/files/" +
+    req.params.device +
+    "/";
+  await fetch(url, { method: "Get" })
+    .then((res) => res.text())
+    .then(async (text) => {
+      let jspn = text.split("<script>");
+      let data = {};
+      for (i in jspn) {
+        if (jspn[i].includes("net.sf.files")) {
+          data = jspn[i];
+        }
+      }
+      data = data.split(";")[0];
+      data = data.split("net.sf.files =")[1];
+      // preserve newlines, etc - use valid JSON
+      data = data
+        .replace(/\\n/g, "\\n")
+        .replace(/\\'/g, "\\'")
+        .replace(/\\"/g, '\\"')
+        .replace(/\\&/g, "\\&")
+        .replace(/\\r/g, "\\r")
+        .replace(/\\t/g, "\\t")
+        .replace(/\\b/g, "\\b")
+        .replace(/\\f/g, "\\f");
+      // remove non-printable and other non-valid JSON chars
+      data = data.replace(/[\u0000-\u0019]+/g, "");
+      data = JSON.parse(data);
+      let files = await getfileNames(req.params.device);
+      downloads += data[files.pristine].downloads;
+      downloads += data[files.gapps].downloads;
+      let objects = await Downloads.find({ device: req.params.device });
+      let total = objects.reduce((prev, cur) => {
+        return prev + cur.onedriveDownloads;
+      }, 0);
+      downloads += total;
+    });
+  sendJson(res, { downloads });
 });
 
 /* GET users listing. */
@@ -255,8 +328,8 @@ router.get("/getFile/name/:device", async (req, res, next) => {
   let device = req.params.device;
   let files = await getfileNames(device);
   let json = {
-    gapps: files[0],
-    pristine: files[1],
+    gapps: files.gapps,
+    pristine: files.pristine,
   };
   sendJson(res, json);
 });
