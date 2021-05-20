@@ -253,8 +253,8 @@ router.get("/stats/:device", async (req, res, next) => {
       data = data.replace(/[\u0000-\u0019]+/g, "");
       data = JSON.parse(data);
       let files = await getfileNames(req.params.device);
-      downloads += data[files.pristine].downloads;
-      downloads += data[files.gapps].downloads;
+      downloads += data[files.pristine] ? data[files.pristine].downloads : 0;
+      downloads += data[files.gapps] ? data[files.gapps].downloads : 0;
       let objects = await Downloads.find({ device: req.params.device });
       let total = objects.reduce((prev, cur) => {
         return prev + cur.onedriveDownloads;
