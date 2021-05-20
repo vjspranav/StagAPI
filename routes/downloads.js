@@ -106,6 +106,7 @@ let getDevices = async () => {
 let getfileNames = async (device) => {
   let gapps = "";
   let pristine = "";
+  let date = 0;
   let url =
     "https://raw.githubusercontent.com/StagOS-Devices/OTA/r11/" + device;
   await fetch(url + "/gapps.json", { method: "Get" })
@@ -116,6 +117,7 @@ let getfileNames = async (device) => {
         .then((res, err) => res.json())
         .then((json, err) => {
           pristine = json.response[0].filename;
+          date = json.response[0].datetime;
           // console.log(gapps, pristine);
         })
         .catch(() => {
@@ -125,7 +127,7 @@ let getfileNames = async (device) => {
     .catch(() => {
       return -1;
     });
-  if (gapps && pristine) return { gapps, pristine };
+  if (gapps && pristine) return { gapps, pristine, date };
   return { error: "Not Found" };
 };
 
@@ -223,6 +225,7 @@ router.get("/showraw", async (req, res, next) => {
 /* GET raw statistics listing. */
 router.get("/stats/:device", async (req, res, next) => {
   let downloads = 0;
+  let date = 0;
   let url =
     "https://sourceforge.net/projects/stagos-11/files/" +
     req.params.device +
@@ -255,13 +258,14 @@ router.get("/stats/:device", async (req, res, next) => {
       let files = await getfileNames(req.params.device);
       downloads += data[files.pristine] ? data[files.pristine].downloads : 0;
       downloads += data[files.gapps] ? data[files.gapps].downloads : 0;
+      date = files.date;
       let objects = await Downloads.find({ device: req.params.device });
       let total = objects.reduce((prev, cur) => {
         return prev + cur.onedriveDownloads;
       }, 0);
       downloads += total;
     });
-  sendJson(res, { downloads });
+  sendJson(res, { downloads, date: date });
 });
 
 /* GET users listing. */
