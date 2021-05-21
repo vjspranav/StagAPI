@@ -223,9 +223,62 @@ router.get("/showraw", async (req, res, next) => {
 });
 
 /* GET raw statistics listing. */
+let getPlingDownloads = async (device) => {
+  let downloads = 0;
+  let url =
+    "https://raw.githubusercontent.com/vjspranav/StagOS_Downloads/main/src/data/devices.json";
+  let pling = await fetch(url, { method: "Get" })
+    .then((res, err) => res.json())
+    .then(async (json, err) => {
+      for (i in json) {
+        let company = json[i];
+        if (Object.keys(company).includes(device)) {
+          return company[device].download;
+        }
+      }
+      return 0;
+    })
+    .catch(() => {
+      return 0;
+    });
+  console.log(pling);
+  await fetch(pling, { method: "Get" })
+    .then((res) => res.text())
+    .then(async (text) => {
+      let jspn = text.split("<script>");
+      let data = {};
+      for (i in jspn) {
+        if (jspn[i].includes("filesJson")) {
+          data = jspn[i];
+        }
+      }
+      data = data.split("filesJson = ")[1].split(";\n")[0];
+      // preserve newlines, etc - use valid JSON
+      data = data
+        .replace(/\\n/g, "\\n")
+        .replace(/\\'/g, "\\'")
+        .replace(/\\"/g, '\\"')
+        .replace(/\\&/g, "\\&")
+        .replace(/\\r/g, "\\r")
+        .replace(/\\t/g, "\\t")
+        .replace(/\\b/g, "\\b")
+        .replace(/\\f/g, "\\f");
+      // remove non-printable and other non-valid JSON chars
+      data = data.replace(/[\u0000-\u0019]+/g, "");
+      data = JSON.parse(data);
+      for (file in data) {
+        downloads += Number.parseInt(data[file].downloaded_count);
+      }
+    });
+  return downloads;
+};
+
+/* GET raw statistics listing. */
 router.get("/stats/:device", async (req, res, next) => {
   let downloads = 0;
   let date = 0;
+  // Add downloads from pling
+  downloads += await getPlingDownloads(req.params.device);
   let url =
     "https://sourceforge.net/projects/stagos-11/files/" +
     req.params.device +
@@ -256,8 +309,9 @@ router.get("/stats/:device", async (req, res, next) => {
       data = data.replace(/[\u0000-\u0019]+/g, "");
       data = JSON.parse(data);
       let files = await getfileNames(req.params.device);
-      downloads += data[files.pristine] ? data[files.pristine].downloads : 0;
-      downloads += data[files.gapps] ? data[files.gapps].downloads : 0;
+      for (file in data) {
+        downloads += data[file] ? data[file].downloads : 0;
+      }
       date = files.date;
       let objects = await Downloads.find({ device: req.params.device });
       let total = objects.reduce((prev, cur) => {
