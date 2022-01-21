@@ -148,7 +148,6 @@ const create_pr = async (
   device_name,
   device_company,
   device_codename,
-  maintainer_name,
   tg_username
 ) => {
   // Clone https://github.com/StagOS/android_packages_apps_Horns/ s12 branch
@@ -208,4 +207,6 @@ const create_pr = async (
   console.log("Done!");
 };
 
-create_pr("Nokia 6.1", "Nokia", "PL2", "vjspranav", "vjspranav");
+module.exports = {
+  create_pr,
+};  // end of module.exports

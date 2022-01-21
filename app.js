@@ -35,6 +35,7 @@ connection.once("open", function () {
 var indexRouter = require("./routes/index");
 var downloadsRouter = require("./routes/downloads");
 var updatesRouter = require("./routes/updates");
+var maintainersRouter = require("./routes/maintainers");
 
 var app = express();
 
@@ -51,6 +52,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/", indexRouter);
 app.use("/downloads", downloadsRouter);
 app.use("/updates", updatesRouter);
+app.use("/maintainers", maintainersRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

@@ -81,7 +81,4 @@ const MaintainersSchema = new Schema({
   },
 });
 
-module.exports = MaintainersSchema = mongoose.model(
-  "Maintainers",
-  MaintainersSchema
-);
+module.exports = Maintainers = mongoose.model("Maintainers", MaintainersSchema);
