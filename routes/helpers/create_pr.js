@@ -1,9 +1,10 @@
-const { exec } = require("child_process");
+const { execSync } = require("child_process");
 const fs = require("fs");
 const { compileFunction } = require("vm");
 const xml2js = require("xml2js");
+const shell = require("shelljs");
 
-const edit_maintainer_string_xml = (
+const edit_maintainer_string_xml = async (
   path,
   device,
   device_company,
@@ -13,9 +14,9 @@ const edit_maintainer_string_xml = (
   let lower_company = device_company.toLowerCase();
   // Read xml at path
   let parser = new xml2js.Parser();
-  fs.readFile(path, function (err, data) {
-    parser.parseString(data, function (err, result) {
-      let tmp_category = 'device_category_' + lower_company + '_title';
+  await fs.readFile(path, (err, data) => {
+    parser.parseString(data, (err, result) => {
+      let tmp_category = "device_category_" + lower_company + "_title";
       // check tmp_category is there is $.name
       let category_found = false;
       for (
@@ -72,13 +73,14 @@ const edit_maintainer_string_xml = (
       });
     });
   });
+  return true;
 };
 
-const edit_xml = (path, device_codename, device_company) => {
+const edit_xml = async (path, device_codename, device_company) => {
   device_company = device_company.toLowerCase();
   // Edit xml at path
   let parser = new xml2js.Parser();
-  fs.readFile(path, function (err, data) {
+  await fs.readFile(path, function (err, data) {
     parser.parseString(data, function (err, result) {
       let t_id = "@+id/device_category_" + device_company;
       // check if t_id is there is android:id
@@ -97,33 +99,35 @@ const edit_xml = (path, device_codename, device_company) => {
       if (!id_found) {
         console.log("creating category");
         let new_category = {
-          '$': {
-            'android:id': t_id,
-            'android:title': '@string/device_category_' + device_company + '_title',
+          $: {
+            "android:id": t_id,
+            "android:title":
+              "@string/device_category_" + device_company + "_title",
           },
-          'Preference': []
-        }
+          Preference: [],
+        };
         result.PreferenceScreen.PreferenceCategory.push(new_category);
         id_found = result.PreferenceScreen.PreferenceCategory.length;
       } else {
         console.log("category already exists");
       }
       let new_pref = {
-        '$': {
-          'android:id': '@+id/device_' + device_codename,
-          'android:icon': '@drawable/stag_device',
-          'android:summary': '@string/device_' + device_codename + '_summary',
-          'android:title': '@string/device_' + device_codename,
-        }
-      }
-      result.PreferenceScreen.PreferenceCategory[id_found - 1].Preference = result.PreferenceScreen.PreferenceCategory[id_found - 1].Preference.filter(
-        (pref) => {
-          if(pref.$["android:id"] == '@+id/device_' + device_codename) {
+        $: {
+          "android:id": "@+id/device_" + device_codename,
+          "android:icon": "@drawable/stag_device",
+          "android:summary": "@string/device_" + device_codename + "_summary",
+          "android:title": "@string/device_" + device_codename,
+        },
+      };
+      result.PreferenceScreen.PreferenceCategory[id_found - 1].Preference =
+        result.PreferenceScreen.PreferenceCategory[
+          id_found - 1
+        ].Preference.filter((pref) => {
+          if (pref.$["android:id"] == "@+id/device_" + device_codename) {
             console.log("Replacing Maintainer");
           }
-          return pref.$["android:id"] != '@+id/device_' + device_codename;
-        }
-      );
+          return pref.$["android:id"] != "@+id/device_" + device_codename;
+        });
       result.PreferenceScreen.PreferenceCategory[id_found - 1].Preference.push(
         new_pref
       );
@@ -134,13 +138,13 @@ const edit_xml = (path, device_codename, device_company) => {
           return console.log(err);
         }
         console.log("The file was saved!");
-      }
-      );
+      });
     });
   });
+  return true;
 };
 
-const create_pr = (
+const create_pr = async (
   device_name,
   device_company,
   device_codename,
@@ -155,14 +159,53 @@ const create_pr = (
   let repo_url = `https://github.com/StagOS/android_packages_apps_Horns/`;
   let repo_dir = `/tmp/android_packages_apps_Horns`;
   let repo_branch = `s12`;
-  // Clone using exec
-  exec(`git clone ${repo_url} ${repo_dir}`, (err, stdout, stderr) => {
-    // Check for errors
-    if (err || stderr) {
-      console.log(err || stderr);
-      return false;
+  // delete repo_dir
+  execSync(`rm -rf ${repo_dir}`);
+  // Clone using execSync
+  execSync(`git clone ${repo_url} ${repo_dir}`);
+  // change to branch s12-device
+  execSync(`cd ${repo_dir} && git checkout ${repo_branch}`);
+  console.log("changed to branch s12");
+  // Add new device
+  let st1 = await edit_maintainer_string_xml(
+    `${repo_dir}/res/values/maintainers_strings.xml`,
+    device_name,
+    device_company,
+    device_codename,
+    tg_username
+  );
+  let st2 = await edit_xml(
+    `${repo_dir}/res/xml/device_maintainers_fragment.xml`,
+    device_codename,
+    device_company
+  );
+  // sleep for a bit
+  await new Promise((resolve) => setTimeout(resolve, 3000));
+  if (st1 && st2) {
+    console.log("Device added to xml");
+    // Commit changes
+    // Run external tool synchronously
+    if (
+      shell.exec(`cd ${repo_dir} && git commit res -m "${pr_body}"`).code !== 0
+    ) {
+      shell.echo("Error: Git commit failed");
+      shell.exit(1);
     }
-  });
+    //   console.log("Commited changes");
+    // Push changes
+    execSync(`cd ${repo_dir} && git checkout -b ${pr_branch}`);
+    execSync(`cd ${repo_dir} && git push origin ${pr_branch}`);
+    console.log("Pushed changes");
+    // Create PR
+    execSync(
+      `cd ${repo_dir} && gh pr create -B ${repo_branch} -H ${pr_branch} -b "${pr_body}" --fill`
+    );
+    console.log("Created PR");
+  } else {
+    // Delete repo
+    execSync(`rm -rf ${repo_dir}`);
+  }
+  console.log("Done!");
 };
 
-edit_maintainer_string_xml("keys/m.xml", "Xiaomi Note 10 Pro", "Xiaomi", "sweetlassi", "jenni");
+create_pr("Nokia 6.1", "Nokia", "PL2", "vjspranav", "vjspranav");
