@@ -23,6 +23,7 @@ let mongouri = dbconfig.mongouri;
 // Connection to MongoDB
 mongoose.connect(mongouri + "/" + DB_NAME, {
   useNewUrlParser: true,
+  useUnifiedTopology: true,
 });
 const connection = mongoose.connection;
 connection.once("open", function () {
