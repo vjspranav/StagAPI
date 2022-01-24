@@ -35,7 +35,7 @@ router.get("/companies", (req, res, next) => {
     let companies = [];
     maintainers.forEach((maintainer) => {
       if (companies.indexOf(maintainer.company) === -1) {
-        companies.push(maintainer.company);
+        companies.push(maintainer.device_company);
       }
     });
 
