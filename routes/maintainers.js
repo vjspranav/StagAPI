@@ -22,6 +22,31 @@ router.get("/", (req, res, next) => {
   });
 });
 
+/* Get all device companies */
+router.get("/companies", (req, res, next) => {
+  Maintainers.find({}, (err, maintainers) => {
+    if (err) {
+      return res.json({
+        status: 500,
+        message: "Error getting companies",
+        error: err,
+      });
+    }
+    let companies = [];
+    maintainers.forEach((maintainer) => {
+      if (companies.indexOf(maintainer.company) === -1) {
+        companies.push(maintainer.company);
+      }
+    });
+
+    return res.json({
+      status: 200,
+      message: "Companies",
+      companies: companies,
+    });
+  });
+});
+
 /* POST apply for maintainer */
 router.post("/apply", (req, res, next) => {
   /**
@@ -161,7 +186,7 @@ router.post("/updateStatus", (req, res, next) => {
     });
 });
 
-/* Get request to create pr */
+/* Post request to create pr */
 router.post("/createPR", (req, res, next) => {
   const { id, pass } = req.body;
   if (pass === password) {
