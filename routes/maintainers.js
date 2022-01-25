@@ -2,7 +2,47 @@ const express = require("express");
 const router = express.Router();
 const Maintainers = require("../models/maintainers");
 const { create_pr } = require("./helpers/create_pr");
+const nodeMailer = require("nodemailer");
+const { zoho_email, zoho_pass } = require("../keys/prod");
 
+// Setup node mailer
+const transporter = nodeMailer.createTransport({
+  name: "zoho.in",
+  host: "smtp.zoho.in",
+  secure: true,
+  port: 465,
+  auth: {
+    user: zoho_email,
+    pass: zoho_pass,
+  },
+});
+transporter.verify((error, success) => {
+  if (error) {
+    console.log(error);
+  } else {
+    console.log("Server is ready to take messages");
+  }
+});
+
+const send_email = (email, subject, text) => {
+  transporter.sendMail(
+    {
+      from: zoho_email,
+      to: email,
+      subject: subject,
+      text: text,
+    },
+    (err, info) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log(info);
+      }
+    }
+  );
+};
+
+send_email("pranavasri@live.in", "Test", "Test");
 // Getting pass
 let config = {};
 try {
@@ -106,6 +146,11 @@ router.post("/apply", (req, res, next) => {
   newMaintainer
     .save()
     .then((maintainer) => {
+      send_email(
+        maintainer.email,
+        "Maintainer application Recieved",
+        `Hello ${maintainer.name},\n\nYour application has been recieved.\n\nWe will get back to you soon.\n\nThanks,\n\nTeam Stag OS`
+      );
       return res.json({
         status: 200,
         message: "Maintainer application submitted",
@@ -166,6 +211,25 @@ router.post("/updateStatus", (req, res, next) => {
   if (pass === password)
     Maintainers.findByIdAndUpdate(id, { status })
       .then((maintainer) => {
+        if (status == "Reviewing") {
+          send_email(
+            maintainer.email,
+            "Maintainer application Reviewing",
+            `Hello ${maintainer.name},\n\nYour application is being reviewed.\n\nWe will get back to you soon.\n\nThanks,\n\nTeam Stag OS`
+          );
+        } else if (status == "Approved") {
+          send_email(
+            maintainer.email,
+            "Maintainer application Approved",
+            `Hello ${maintainer.name},\n\nCongratulations, Your application has been approved.\n\nPlease join our maintainers telegam group using this link: https://t.me/+aM08Qu2mJ6Q1MGQ1.\n\nThanks,\n\nTeam Stag OS`
+          );
+        } else if (status == "Rejected") {
+          send_email(
+            maintainer.email,
+            "Maintainer application Rejected",
+            `Hello ${maintainer.name},\n\nWe are sorry, Your application has been rejected. You can contact @vjspranav on telegram for further details\n\nThanks,\n\nTeam Stag OS`
+          );
+        }
         return res.json({
           status: 200,
           message: "Maintainer status updated",
