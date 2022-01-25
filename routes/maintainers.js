@@ -79,7 +79,12 @@ router.get("/companies", (req, res, next) => {
         companies.push(maintainer.device_company);
       }
     });
-
+    // Remove duplicates (lowercase, upper case)
+    companies = companies.filter(
+      (company, index, self) =>
+        index ===
+        self.findIndex((t) => t.toLowerCase() === company.toLowerCase())
+    );
     return res.json({
       status: 200,
       message: "Companies",
