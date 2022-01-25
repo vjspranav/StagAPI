@@ -4,6 +4,7 @@ const Maintainers = require("../models/maintainers");
 const { create_pr } = require("./helpers/create_pr");
 const nodeMailer = require("nodemailer");
 const { zoho_email, zoho_pass } = require("../keys/prod");
+const ObjectID = require("mongodb").ObjectID;
 
 // Setup node mailer
 const transporter = nodeMailer.createTransport({
@@ -20,7 +21,7 @@ transporter.verify((error, success) => {
   if (error) {
     console.log(error);
   } else {
-    console.log("Server is ready to take messages");
+    console.log("SMTP Connection successful");
   }
 });
 
@@ -42,7 +43,7 @@ const send_email = (email, subject, text) => {
   );
 };
 
-send_email("pranavasri@live.in", "Test", "Test");
+// send_email("pranavasri@live.in", "Test", "Test");
 // Getting pass
 let config = {};
 try {
@@ -90,7 +91,7 @@ router.get("/companies", (req, res, next) => {
 /* GET to get maintainer status */
 router.get("/status/:id ", (req, res, next) => {
   const id = req.params.id;
-  Maintainers.findById(id, (err, maintainer) => {
+  Maintainers.findById(new ObjectID(id), (err, maintainer) => {
     if (err) {
       return res.json({
         status: 500,
