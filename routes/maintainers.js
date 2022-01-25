@@ -87,6 +87,31 @@ router.get("/companies", (req, res, next) => {
   });
 });
 
+/* GET to get maintainer status */
+router.get("/status/:id ", (req, res, next) => {
+  const id = req.params.id;
+  Maintainers.findById(id, (err, maintainer) => {
+    if (err) {
+      return res.json({
+        status: 500,
+        message: "Error getting maintainer",
+        error: err,
+      });
+    }
+    if (!maintainer) {
+      return res.json({
+        status: 404,
+        message: "Maintainer not found",
+      });
+    }
+    return res.json({
+      status: 200,
+      message: "Maintainer status",
+      maintainer: maintainer,
+    });
+  });
+});
+
 /* POST apply for maintainer */
 router.post("/apply", (req, res, next) => {
   /**
@@ -149,7 +174,7 @@ router.post("/apply", (req, res, next) => {
       send_email(
         maintainer.email,
         "Maintainer application Recieved",
-        `Hello ${maintainer.name},\n\nYour application has been recieved.\n\nWe will get back to you soon.\n\nThanks,\n\nTeam Stag OS`
+        `Hello ${maintainer.name},\n\nYour application has been recieved.\n\nWe will get back to you soon.\nYou can check application status at: https://maintainers.stag-os.org/#/status\nYour application id is ${maintainer._id}\n\nThanks,\n\nTeam Stag OS`
       );
       return res.json({
         status: 200,
