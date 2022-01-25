@@ -241,6 +241,12 @@ router.get("/pending", (req, res, next) => {
 /* Post request to update status */
 router.post("/updateStatus", (req, res, next) => {
   const { id, status, pass } = req.body;
+  if (status == "Accepted") {
+    return res.json({
+      status: 500,
+      message: "Cannot accept maintainer",
+    });
+  }
   if (pass === password)
     Maintainers.findByIdAndUpdate(id, { status })
       .then((maintainer) => {
@@ -249,12 +255,6 @@ router.post("/updateStatus", (req, res, next) => {
             maintainer.email,
             "Maintainer application Reviewing",
             `Hello ${maintainer.name},\n\nYour application is being reviewed.\n\nWe will get back to you soon.\n\nThanks,\n\nTeam Stag OS`
-          );
-        } else if (status == "Accepted") {
-          send_email(
-            maintainer.email,
-            "Maintainer application Approved",
-            `Hello ${maintainer.name},\n\nCongratulations, Your application has been approved.\n\nPlease join our maintainers telegam group using this link: https://t.me/+aM08Qu2mJ6Q1MGQ1.\n\nThanks,\n\nTeam Stag OS`
           );
         } else if (status == "Rejected") {
           send_email(
@@ -297,6 +297,11 @@ router.post("/createPR", (req, res, next) => {
             maintainer.tg_username
           );
           Maintainers.findByIdAndUpdate(id, { status: "Accepted" });
+          send_email(
+            maintainer.email,
+            "Maintainer application Approved",
+            `Hello ${maintainer.name},\n\nCongratulations, Your application has been approved.\n\nPlease join our maintainers telegam group using this link: https://t.me/+aM08Qu2mJ6Q1MGQ1.\n\nThanks,\n\nTeam Stag OS`
+          );
           return res.json({
             status: 200,
             message: "Maintainer pr created",
