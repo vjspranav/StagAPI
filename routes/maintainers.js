@@ -241,12 +241,6 @@ router.get("/pending", (req, res, next) => {
 /* Post request to update status */
 router.post("/updateStatus", (req, res, next) => {
   const { id, status, pass } = req.body;
-  if (status == "Accepted") {
-    return res.json({
-      status: 500,
-      message: "Cannot accept maintainer",
-    });
-  }
   if (pass === password)
     Maintainers.findByIdAndUpdate(id, { status })
       .then((maintainer) => {
