@@ -250,7 +250,7 @@ router.post("/updateStatus", (req, res, next) => {
             "Maintainer application Reviewing",
             `Hello ${maintainer.name},\n\nYour application is being reviewed.\n\nWe will get back to you soon.\n\nThanks,\n\nTeam Stag OS`
           );
-        } else if (status == "Approved") {
+        } else if (status == "Accepted") {
           send_email(
             maintainer.email,
             "Maintainer application Approved",
