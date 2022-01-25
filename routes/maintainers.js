@@ -89,9 +89,11 @@ router.get("/companies", (req, res, next) => {
 });
 
 /* GET to get maintainer status */
-router.get("/status/:id ", (req, res, next) => {
+router.get("/status/:id", (req, res, next) => {
   const id = req.params.id;
-  Maintainers.findById(new ObjectID(id), (err, maintainer) => {
+  console.log("ID: ", id);
+  Maintainers.find({ _id: new ObjectID(id) }, (err, maintainer) => {
+    console.log(maintainer);
     if (err) {
       return res.json({
         status: 500,
