@@ -150,21 +150,21 @@ const create_pr = async (
   device_codename,
   tg_username
 ) => {
-  // Clone https://github.com/StagOS/android_packages_apps_Horns/ s12 branch
-  let pr_branch = `s12-${device_codename}`;
+  // Clone https://github.com/StagOS/android_packages_apps_Horns/ s12.1 branch
+  let pr_branch = `s12.1-${device_codename}`;
   let pr_title = `${device_name}`;
   let pr_body = `Add maintainer for ${device_codename}`;
   // Clone repo to machine
   let repo_url = `https://github.com/StagOS/android_packages_apps_Horns/`;
   let repo_dir = `/tmp/android_packages_apps_Horns`;
-  let repo_branch = `s12`;
+  let repo_branch = `s12.1`;
   // delete repo_dir
   execSync(`rm -rf ${repo_dir}`);
   // Clone using execSync
   execSync(`git clone ${repo_url} ${repo_dir}`);
-  // change to branch s12-device
+  // change to branch s12.1-device
   execSync(`cd ${repo_dir} && git checkout ${repo_branch}`);
-  console.log("changed to branch s12");
+  console.log("changed to branch s12.1");
   // Add new device
   let st1 = await edit_maintainer_string_xml(
     `${repo_dir}/res/values/maintainers_strings.xml`,
