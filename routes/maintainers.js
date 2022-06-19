@@ -327,4 +327,36 @@ router.post("/createPR", (req, res, next) => {
   }
 });
 
+// Get request that takes device_code name as path parameter and returns tg_username and device_name
+router.get("/:device_code", (req, res) => {
+  const { device_code } = req.params;
+  console.log(device_code);
+  // Find maintainer with device_code and status Accepted
+  Maintainers.findOne({
+    device_codename: device_code,
+    status: "Accepted",
+  })
+    .then((maintainer) => {
+      if (maintainer) {
+        return res.json({
+          status: 200,
+          message: "Maintainer found",
+          data: maintainer,
+        });
+      } else {
+        return res.json({
+          status: 404,
+          message: "Maintainer not found",
+        });
+      }
+    })
+    .catch((err) => {
+      return res.json({
+        status: 500,
+        message: "Error getting maintainer",
+        error: err,
+      });
+    });
+});
+
 module.exports = router;
