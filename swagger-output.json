@@ -1,0 +1,374 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Stag API",
+    "description": "API endpoints for StagOS Infrastructure",
+    "version": "1.0.0"
+  },
+  "host": "api.stag-os.org",
+  "basePath": "/",
+  "schemes": [
+    "https"
+  ],
+  "securityDefinitions": {},
+  "paths": {
+    "/": {
+      "get": {
+        "description": "",
+        "parameters": [],
+        "responses": {}
+      }
+    },
+    "/downloads/": {
+      "get": {
+        "description": "",
+        "parameters": [],
+        "responses": {}
+      }
+    },
+    "/downloads/ota/{device}/{variant}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "device",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "variant",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/downloads/sourceforge/{device}/{variant}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "device",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "variant",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/downloads/showraw": {
+      "get": {
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/downloads/stats/{device}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "device",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/downloads/show": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/downloads/show/stats/{device}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "device",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/downloads/getFile/name/{device}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "device",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/updates/{device}/{variant}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "device",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "variant",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/maintainers/": {
+      "get": {
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/maintainers/companies": {
+      "get": {
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/maintainers/status/{id}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/maintainers/apply": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "github_username": {
+                  "example": "any"
+                },
+                "email": {
+                  "example": "any"
+                },
+                "device_name": {
+                  "example": "any"
+                },
+                "device_company": {
+                  "example": "any"
+                },
+                "device_codename": {
+                  "example": "any"
+                },
+                "device_tree": {
+                  "example": "any"
+                },
+                "kernel": {
+                  "example": "any"
+                },
+                "vendor": {
+                  "example": "any"
+                },
+                "common_tree": {
+                  "example": "any"
+                },
+                "common_vendor": {
+                  "example": "any"
+                },
+                "other_dependencies": {
+                  "example": "any"
+                },
+                "selinux_status": {
+                  "example": "any"
+                },
+                "name": {
+                  "example": "any"
+                },
+                "tg_username": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/maintainers/all": {
+      "get": {
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/maintainers/pending": {
+      "get": {
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/maintainers/updateStatus": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "example": "any"
+                },
+                "status": {
+                  "example": "any"
+                },
+                "pass": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/maintainers/createPR": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "example": "any"
+                },
+                "pass": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/maintainers/{device_code}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "device_code",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  }
+}

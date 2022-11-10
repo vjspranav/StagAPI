@@ -38,7 +38,10 @@ var updatesRouter = require("./routes/updates");
 var maintainersRouter = require("./routes/maintainers");
 
 var app = express();
+const swaggerUi = require("swagger-ui-express");
+const swaggerDocument = require("./swagger-output.json");
 
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "jade");
