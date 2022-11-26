@@ -1,4 +1,5 @@
-const router = express.Router();
+var express = require("express");
+var router = express.Router();
 
 // Add a simple get route
 router.get("/", (req, res) => {
