@@ -76,6 +76,9 @@ router.get("/companies", (req, res, next) => {
     let companies = [];
     maintainers.forEach((maintainer) => {
       // Check if maintiner.version exists and is not eqal to 13
+      if (!maintainer.version) {
+        return;
+      }
       if (maintainer.version && maintainer.version !== "13") {
         return;
       }
@@ -216,6 +219,9 @@ router.get("/all", (req, res, next) => {
     .then((maintainers) => {
       // Filter maintainers with version 13
       maintainers = maintainers.filter((maintainer) => {
+        if (!maintainer.version) {
+          return false;
+        }
         if (maintainer.version && maintainer.version !== "13") {
           return false;
         }
