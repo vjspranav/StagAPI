@@ -214,6 +214,13 @@ router.post("/apply", (req, res, next) => {
 router.get("/all", (req, res, next) => {
   Maintainers.find()
     .then((maintainers) => {
+      // Filter maintainers with version 13
+      maintainers = maintainers.filter((maintainer) => {
+        if (maintainer.version && maintainer.version !== "13") {
+          return false;
+        }
+        return true;
+      });
       return res.json({
         status: 200,
         message: "All maintainers",
@@ -347,6 +354,7 @@ router.get("/:device_code", (req, res) => {
   // Find maintainer with device_code and status Accepted
   Maintainers.findOne({
     device_codename: device_code,
+    version: "13",
     status: "Accepted",
   })
     .then((maintainer) => {
