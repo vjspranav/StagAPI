@@ -148,16 +148,16 @@ const create_pr = async (
   device_name,
   device_company,
   device_codename,
-  tg_username
+  tg_username,
+  repo_branch = "t13"
 ) => {
   // Clone https://github.com/StagOS/android_packages_apps_Horns/ s12.1 branch
-  let pr_branch = `s12.1-${device_codename}`;
+  let pr_branch = `${repo_branch}-${device_codename}`;
   let pr_title = `${device_name}`;
   let pr_body = `Add maintainer for ${device_codename}`;
   // Clone repo to machine
   let repo_url = `https://github.com/StagOS/android_packages_apps_Horns/`;
   let repo_dir = `/tmp/android_packages_apps_Horns`;
-  let repo_branch = `s12.1`;
   // delete repo_dir
   execSync(`rm -rf ${repo_dir}`);
   // Clone using execSync
@@ -209,4 +209,4 @@ const create_pr = async (
 
 module.exports = {
   create_pr,
-};  // end of module.exports
+}; // end of module.exports

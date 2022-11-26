@@ -3,7 +3,7 @@ const router = express.Router();
 const Maintainers = require("../../models/maintainers");
 const { create_pr } = require("../helpers/create_pr");
 const nodeMailer = require("nodemailer");
-const { zoho_email, zoho_pass } = require("../../keys/prod");
+const { zoho_email, zoho_pass, tg_link } = require("../../keys/prod");
 const ObjectID = require("mongodb").ObjectID;
 
 // Setup node mailer
@@ -75,6 +75,16 @@ router.get("/companies", (req, res, next) => {
     }
     let companies = [];
     maintainers.forEach((maintainer) => {
+      // Check if maintiner.version exists and is not eqal to 13
+      if (maintainer.version && maintainer.version !== "13") {
+        return;
+      }
+      maintainer.company = maintainer.company.trim();
+      // First letter of company name to uppercase
+      maintainer.company =
+        maintainer.company.charAt(0).toUpperCase() +
+        maintainer.company.slice(1);
+
       if (companies.indexOf(maintainer.company) === -1) {
         companies.push(maintainer.device_company);
       }
@@ -175,6 +185,7 @@ router.post("/apply", (req, res, next) => {
     status,
     name,
     tg_username,
+    version: "13",
   });
   newMaintainer
     .save()
@@ -241,6 +252,7 @@ router.get("/pending", (req, res, next) => {
 /* Post request to update status */
 router.post("/updateStatus", (req, res, next) => {
   const { id, status, pass } = req.body;
+  const review = req.body.review || "No reason provided";
   if (pass === password)
     Maintainers.findByIdAndUpdate(id, { status })
       .then((maintainer) => {
@@ -254,7 +266,7 @@ router.post("/updateStatus", (req, res, next) => {
           send_email(
             maintainer.email,
             "Maintainer application Rejected",
-            `Hello ${maintainer.name},\n\nWe are sorry, Your application has been rejected. You can contact @vjspranav on telegram for further details\n\nThanks,\n\nTeam Stag OS`
+            `Hello ${maintainer.name},\n\nWe are sorry, Your application has been rejected for the following reason:\n${review}\n\nThanks,\n\nTeam Stag OS`
           );
         }
         return res.json({
@@ -280,6 +292,7 @@ router.post("/updateStatus", (req, res, next) => {
 /* Post request to create pr */
 router.post("/createPR", (req, res, next) => {
   const { id, pass } = req.body;
+  const review = req.body.review || "No additional info provided";
   if (pass === password) {
     Maintainers.findById(id)
       .then((maintainer) => {
@@ -294,7 +307,7 @@ router.post("/createPR", (req, res, next) => {
           send_email(
             maintainer.email,
             "Maintainer application Approved",
-            `Hello ${maintainer.name},\n\nCongratulations, Your application has been approved.\n\nPlease join our maintainers telegam group using this link: https://t.me/+aM08Qu2mJ6Q1MGQ1.\n\nThanks,\n\nTeam Stag OS`
+            `Hello ${maintainer.name},\n\nCongratulations, Your application has been approved.\n\nPlease join our maintainers telegam group using this link: ${tg_link}. \nThe below is some additional info:\n${review}\n\nThanks,\n\nTeam Stag OS`
           );
           return res.json({
             status: 200,

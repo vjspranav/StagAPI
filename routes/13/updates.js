@@ -5,7 +5,7 @@ const fetch = require("node-fetch");
 /* GET users listing. */
 router.get("/:device/:variant", function (req, res, next) {
   let url =
-    "https://raw.githubusercontent.com/StagOS-Devices/OTA/r11/" +
+    "https://raw.githubusercontent.com/StagOS-Devices/OTA/t13/" +
     req.params.device +
     "/" +
     req.params.variant +
