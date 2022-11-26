@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const Maintainers = require("../models/maintainers");
-const { create_pr } = require("./helpers/create_pr");
+const Maintainers = require("../../models/maintainers");
+const { create_pr } = require("../helpers/create_pr");
 const nodeMailer = require("nodemailer");
-const { zoho_email, zoho_pass } = require("../keys/prod");
+const { zoho_email, zoho_pass } = require("../../keys/prod");
 const ObjectID = require("mongodb").ObjectID;
 
 // Setup node mailer
@@ -47,7 +47,7 @@ const send_email = (email, subject, text) => {
 // Getting pass
 let config = {};
 try {
-  config = require("../keys/prod.js");
+  config = require("../../keys/prod.js");
 } catch (ex) {
   config = {
     pass: process.env.ADMIN_PASS,

@@ -1,8 +1,8 @@
-var createError = require("http-errors");
-var express = require("express");
-var path = require("path");
-var cookieParser = require("cookie-parser");
-var logger = require("morgan");
+const createError = require("http-errors");
+const express = require("express");
+const path = require("path");
+const cookieParser = require("cookie-parser");
+const logger = require("morgan");
 
 // For Mongo
 const bodyParser = require("body-parser");
@@ -18,6 +18,7 @@ try {
     mongouri: process.env.ATLAS_URI,
   };
 }
+
 let mongouri = dbconfig.mongouri;
 // Connect to moongose
 // Connection to MongoDB
@@ -32,12 +33,17 @@ connection.once("open", function () {
   );
 });
 
-var indexRouter = require("./routes/index");
-var downloadsRouter = require("./routes/downloads");
-var updatesRouter = require("./routes/updates");
-var maintainersRouter = require("./routes/maintainers");
+const indexRouterOld = require("./routes/old/index");
+const downloadsRouterOld = require("./routes/old/downloads");
+const updatesRouterOld = require("./routes/old/updates");
+const maintainersRouterOld = require("./routes/old/maintainers");
 
-var app = express();
+const indexRouter = require("./routes/13/index");
+const downloadsRouter = require("./routes/13/downloads");
+const updatesRouter = require("./routes/13/updates");
+const maintainersRouter = require("./routes/13/maintainers");
+
+const app = express();
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("./swagger-output.json");
 
@@ -52,6 +58,19 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
+// Setup /old/ routes
+app.use("/old", indexRouterOld);
+app.use("/old/downloads", downloadsRouterOld);
+app.use("/old/updates", updatesRouterOld);
+app.use("/old/maintainers", maintainersRouterOld);
+
+// Setup /13/ routes
+app.use("/13", indexRouter);
+app.use("/13/downloads", downloadsRouter);
+app.use("/13/updates", updatesRouter);
+app.use("/13/maintainers", maintainersRouter);
+
+// Point default route to /13/
 app.use("/", indexRouter);
 app.use("/downloads", downloadsRouter);
 app.use("/updates", updatesRouter);

@@ -2,7 +2,7 @@ const e = require("express");
 var express = require("express");
 var router = express.Router();
 const fetch = require("node-fetch");
-const Downloads = require("../models/downloads");
+const Downloads = require("../../models/downloads");
 
 const urlExist = async (url) => (await fetch(url)).ok;
 

@@ -79,6 +79,15 @@ const MaintainersSchema = new Schema({
     required: true,
     range: ["Applied", "Reviewing", "Accepted", "Rejected"],
   },
+  review: {
+    type: String,
+    required: false,
+  },
+  version: {
+    type: String,
+    required: true,
+    range: ["12", "13"],
+  },
 });
 
 module.exports = Maintainers = mongoose.model("Maintainers", MaintainersSchema);
