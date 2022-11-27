@@ -82,13 +82,13 @@ router.get("/companies", (req, res, next) => {
       if (maintainer.version && maintainer.version !== "13") {
         return;
       }
-      maintainer.company = maintainer.company.trim();
+      maintainer.company = maintainer.device_company.trim();
       // First letter of company name to uppercase
-      maintainer.company =
-        maintainer.company.charAt(0).toUpperCase() +
-        maintainer.company.slice(1);
+      maintainer.device_company =
+        maintainer.device_company.charAt(0).toUpperCase() +
+        maintainer.device_company.slice(1);
 
-      if (companies.indexOf(maintainer.company) === -1) {
+      if (companies.indexOf(maintainer.device_company) === -1) {
         companies.push(maintainer.device_company);
       }
     });
