@@ -171,6 +171,30 @@ router.post("/apply", (req, res, next) => {
     name,
     tg_username,
   } = req.body;
+
+  // Check if another maintainer has applied for the same device
+  Maintainers.find(
+    {
+      device_codename: device_codename,
+      status: "Accepted",
+    },
+    (err, maintainer) => {
+      if (err) {
+        return res.json({
+          status: 500,
+          message: "Error getting maintainer",
+          error: err,
+        });
+      }
+      if (maintainer.length > 0) {
+        return res.json({
+          status: 403,
+          message: "Another maintainer is already maintaining this device",
+        });
+      }
+    }
+  );
+
   const status = "Applied";
   const newMaintainer = new Maintainers({
     github_username,
