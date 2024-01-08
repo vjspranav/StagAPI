@@ -1,15 +1,9 @@
 // Create clients and set shared const values outside of the handler.
-
-// Create a DocumentClient that represents the query to add an item
-// const {Maintainers} = require('/opt/maintainers');
 import { MongoClient } from "mongodb";
 
 const MONGOURI = process.env.MONGOURI;
 const client = new MongoClient(MONGOURI);
 
-/**
- * A simple example includes a HTTP get method to get all items from a DynamoDB table.
- */
 export const getAllMaintainersHandler = async (event) => {
     if (event.httpMethod !== 'GET') {
         throw new Error(`getAllItems only accept GET method, you tried: ${event.httpMethod}`);

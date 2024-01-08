@@ -9,6 +9,10 @@ Parameters:
     Type: String
     Description: MongoDB URI
     Default: mongodb://localhost:27017/stagos
+  VERSION:
+    Type: String
+    Description: Version
+    Default: 14
 
 # Resources declares the AWS resources that you want to include in the stack
 # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html
@@ -38,6 +42,27 @@ Resources:
             Path: /maintainers
             Method: GET
  
+  getMaintainersFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/get-maintainers.getMaintainersHandler
+      Runtime: nodejs20.x
+      Architectures:
+      - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: A simple example includes a HTTP get method to get all Maintainers from
+        a MongoDB table.
+      Environment:
+        Variables:
+          MONGOURI: !Ref MONGOURI
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /maintainers/{device}
+            Method: GET
+
   # Each Lambda function is defined by properties:
   # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
 

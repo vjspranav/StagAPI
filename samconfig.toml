@@ -21,7 +21,7 @@ s3_prefix = "stagos-api"
 region = "ap-south-1"
 disable_rollback = true
 image_repositories = []
-parameter_overrides = "MONGOURI=\"mongodb://localhost:27017/stagos\""
+parameter_overrides = "MONGOURI=\"mongodb://localhost:27017/stagos\" VERSION=\"14\""
 
 [default.package.parameters]
 resolve_s3 = true
