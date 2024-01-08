@@ -1,3 +1,5 @@
 node_modules
 .aws-sam
 .vscode
+.env
+env.json
