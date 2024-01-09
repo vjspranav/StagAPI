@@ -22,6 +22,7 @@ jobs:
       # Run Unit tests- Specify unit tests here
 
       # sam deploy
-      - run: sam deploy --config-env default --no-confirm-changeset --no-fail-on-empty-changeset --parameter-overrides "MONGOURI=$MONGOURI STAGE=Prod VERSION=14"
+      - run: sam deploy --config-env default --no-confirm-changeset --no-fail-on-empty-changeset --parameter-overrides "MONGOURI=$MONGOURI STAGE=Prod VERSION=14 ZOHOPASS=$ZOHOPASS"
         env:
           MONGOURI: ${{ secrets.MONGOURI }}
+          ZOHOPASS: ${{ secrets.ZOHOPASS }}

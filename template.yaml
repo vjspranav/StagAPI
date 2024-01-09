@@ -17,10 +17,23 @@ Parameters:
     Type: String
     Description: Stage
     Default: Prod
+  ZOHOPASS:
+    Type: String
+    Description: Zoho Password
+    Default: password
 
 # Resources declares the AWS resources that you want to include in the stack
 # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html
 Resources:
+  CommonLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: common-layer
+      Description: Dependencies and middlewares for our backend
+      ContentUri: common-layer/
+      CompatibleRuntimes:
+        - nodejs20.x
+
   # Each Lambda function is defined by properties:
   # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
   ApiDeployment:
@@ -71,6 +84,30 @@ Resources:
           Properties:
             Path: /maintainers/{device}
             Method: GET
+            RestApiId: !Ref ApiDeployment
+
+  postApplyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/post-apply.postApplyHandler
+      Runtime: nodejs20.x
+      Architectures:
+      - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Layers:
+        - !Ref CommonLayer
+      Description: Maintainer Application Endpoint
+      Environment:
+        Variables:
+          MONGOURI: !Ref MONGOURI
+          ZOHOPASS: !Ref ZOHOPASS
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /maintainers/apply
+            Method: POST
             RestApiId: !Ref ApiDeployment
 
   # Each Lambda function is defined by properties:

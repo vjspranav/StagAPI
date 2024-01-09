@@ -1,0 +1,4 @@
+{
+    "httpMethod": "POST",
+    "body": "{\"github_username\":\"test\",\"email\":\"test\",\"device_name\":\"test\",\"device_company\":\"test\",\"device_codename\":\"test\",\"device_tree\":\"test\",\"kernel\":\"test\",\"vendor\":\"test\",\"common_tree\":\"test\",\"common_vendor\":\"test\",\"other_dependencies\":\"test\",\"selinux_status\":\"test\",\"name\":\"test\",\"tg_username\":\"test\"}"
+}
