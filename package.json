@@ -12,7 +12,8 @@
     },
     "scripts": {
         "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js",
-        "deploy": "sam build && export $(cat .env | xargs) && sam deploy --config-env default --parameter-overrides MONGOURI=$MONGOURI " 
+        "deploy-13": "sam build && export $(cat .env | xargs) && sam deploy --config-env 13 --parameter-overrides MONGOURI=$MONGOURI VERSION=13 STAGE=13",
+        "deploy": "sam build && export $(cat .env | xargs) && sam deploy --config-env default --parameter-overrides MONGOURI=$MONGOURI STAGE=Prod" 
     },
     "jest": {
         "testMatch": [

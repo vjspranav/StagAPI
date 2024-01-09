@@ -34,3 +34,13 @@ warm_containers = "EAGER"
 
 [default.local_start_lambda.parameters]
 warm_containers = "EAGER"
+[13.deploy.parameters]
+stack_name = "stagos-api-13"
+resolve_s3 = true
+s3_prefix = "stagos-api-13"
+region = "ap-south-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+disable_rollback = true
+parameter_overrides = "MONGOURI=\"mongodb://localhost:27017/stagos\" VERSION=\"13\" STAGE=\"13\""
+image_repositories = []

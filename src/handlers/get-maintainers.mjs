@@ -24,6 +24,7 @@ export const getMaintainersHandler = async (event) => {
     const body = await collection.findOne({
       device_codename: device,
       version: VERSION,
+      status: "Accepted"
     });
     console.info("maintainers", body);
     const response = {

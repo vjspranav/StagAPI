@@ -15,7 +15,9 @@ export const getAllMaintainersHandler = async (event) => {
         // Get all items from the Maintainers table
         const db = await client.db("StagOfficial")
         const collection = await db.collection("maintainers")
-        const body = await collection.find({}).toArray()
+        const body = await collection.find({
+            status: "Accepted"
+        }).toArray()
         console.info("maintainers", body);
         const response = {
             statusCode: 200,

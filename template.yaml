@@ -13,12 +13,20 @@ Parameters:
     Type: String
     Description: Version
     Default: 14
+  STAGE:
+    Type: String
+    Description: Stage
+    Default: Prod
 
 # Resources declares the AWS resources that you want to include in the stack
 # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html
 Resources:
   # Each Lambda function is defined by properties:
   # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+  ApiDeployment:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: !Ref STAGE
 
   # This is a Lambda function config associated with the source code: get-all-items.js
   getAllMaintainersFunction:
@@ -41,6 +49,7 @@ Resources:
           Properties:
             Path: /maintainers
             Method: GET
+            RestApiId: !Ref ApiDeployment
  
   getMaintainersFunction:
     Type: AWS::Serverless::Function
@@ -62,6 +71,7 @@ Resources:
           Properties:
             Path: /maintainers/{device}
             Method: GET
+            RestApiId: !Ref ApiDeployment
 
   # Each Lambda function is defined by properties:
   # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
@@ -69,7 +79,7 @@ Resources:
 Outputs:
   WebEndpoint:
     Description: API Gateway endpoint URL for Prod stage
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+    Value: !Sub "https://${ApiDeployment}.execute-api.${AWS::Region}.amazonaws.com/${STAGE}"
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
