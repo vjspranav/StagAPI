@@ -47,6 +47,7 @@ const indexRouter = require("./routes/14/index");
 const downloadsRouter = require("./routes/14/downloads");
 const updatesRouter = require("./routes/14/updates");
 const maintainersRouter = require("./routes/14/maintainers");
+const reportRouter = require("./routes/14/report");
 
 const app = express();
 const swaggerUi = require("swagger-ui-express");
@@ -80,12 +81,14 @@ app.use("/14", indexRouter);
 app.use("/14/downloads", downloadsRouter);
 app.use("/14/updates", updatesRouter);
 app.use("/14/maintainers", maintainersRouter);
+app.use("/14/report", reportRouter);
 
 // Point default route to /14/
 app.use("/", indexRouter);
 app.use("/downloads", downloadsRouter);
 app.use("/updates", updatesRouter);
 app.use("/maintainers", maintainersRouter);
+app.use("/report", reportRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
