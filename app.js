@@ -38,10 +38,15 @@ const downloadsRouterOld = require("./routes/old/downloads");
 const updatesRouterOld = require("./routes/old/updates");
 const maintainersRouterOld = require("./routes/old/maintainers");
 
-const indexRouter = require("./routes/13/index");
-const downloadsRouter = require("./routes/13/downloads");
-const updatesRouter = require("./routes/13/updates");
-const maintainersRouter = require("./routes/13/maintainers");
+const indexRouter13 = require("./routes/13/index");
+const downloadsRouter13 = require("./routes/13/downloads");
+const updatesRouter13 = require("./routes/13/updates");
+const maintainersRouter13 = require("./routes/13/maintainers");
+
+const indexRouter = require("./routes/14/index");
+const downloadsRouter = require("./routes/14/downloads");
+const updatesRouter = require("./routes/14/updates");
+const maintainersRouter = require("./routes/14/maintainers");
 
 const app = express();
 const swaggerUi = require("swagger-ui-express");
@@ -65,12 +70,18 @@ app.use("/old/updates", updatesRouterOld);
 app.use("/old/maintainers", maintainersRouterOld);
 
 // Setup /13/ routes
-app.use("/13", indexRouter);
-app.use("/13/downloads", downloadsRouter);
-app.use("/13/updates", updatesRouter);
-app.use("/13/maintainers", maintainersRouter);
+app.use("/13", indexRouter13);
+app.use("/13/downloads", downloadsRouter13);
+app.use("/13/updates", updatesRouter13);
+app.use("/13/maintainers", maintainersRouter13);
 
-// Point default route to /13/
+// Setup /14/ routes
+app.use("/14", indexRouter);
+app.use("/14/downloads", downloadsRouter);
+app.use("/14/updates", updatesRouter);
+app.use("/14/maintainers", maintainersRouter);
+
+// Point default route to /14/
 app.use("/", indexRouter);
 app.use("/downloads", downloadsRouter);
 app.use("/updates", updatesRouter);
