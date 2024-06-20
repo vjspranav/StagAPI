@@ -2,51 +2,80 @@ const Report = require("../../models/reports");
 const tf_use = require("@tensorflow-models/universal-sentence-encoder");
 const tf = require("@tensorflow/tfjs-node");
 
+let model;
+
+async function loadModel() {
+  model = await tf_use.load();
+}
+
 module.exports = {
   findSimilarReports: async (report) => {
-    const { title, description, reportType } = report;
+    try {
+      const { title, description, reportType } = report;
 
-    // Load the Universal Sentence Encoder model
-    const model = await tf_use.load();
+      // Encode the input report's title and description
+      const inputTitle = await model.embed([title]);
+      const inputDescription = await model.embed([description]);
 
-    // Encode the input report's title and description
-    const inputTitle = await model.embed([title]);
-    const inputDescription = await model.embed([description]);
+      // Find all reports of the same type, and fetch only the titles and descriptions
+      const reports = await Report.find({ reportType });
 
-    // Find all reports of the same type
-    const reports = await Report.find({ reportType });
+      // Extract the titles and descriptions from the reports
+      const titles = reports.map((report) => report.titleEmbedding);
+      const descriptions = reports.map((report) => report.descriptionEmbedding);
 
-    // Encode the titles and descriptions of all reports
-    const titles = await model.embed(reports.map((r) => r.title));
-    const descriptions = await model.embed(reports.map((r) => r.description));
-
-    // Compute the cosine similarity between the input report and all reports
-    const titleSimilarities = await cosineSimilarity(inputTitle, titles);
-    const descriptionSimilarities = await cosineSimilarity(
-      inputDescription,
-      descriptions
-    );
-
-    // Combine the similarities and filter reports above the threshold
-    const similarityThreshold = 0.8;
-    const similarReports = reports.filter((_, i) => {
-      const titleSimilarity = titleSimilarities[i];
-      const descriptionSimilarity = descriptionSimilarities[i];
-      return (
-        titleSimilarity > similarityThreshold ||
-        descriptionSimilarity > similarityThreshold
+      // Compute the cosine similarity between the input report and all reports
+      const titleSimilarities = await cosineSimilarity(
+        inputTitle,
+        tf.tensor(titles)
       );
-    });
+      const descriptionSimilarities = await cosineSimilarity(
+        inputDescription,
+        tf.tensor(descriptions)
+      );
 
-    return similarReports;
+      console.log("titleSimilarities: ", titleSimilarities);
+      console.log("descriptionSimilarities: ", descriptionSimilarities);
+
+      // Combine the similarities and filter reports above the threshold
+      const similarReports = reports.filter((_, i) => {
+        const titleSimilarity = titleSimilarities[i];
+        const descriptionSimilarity = descriptionSimilarities[i];
+        return (
+          titleSimilarity > 0.8 /* High for title */ ||
+          descriptionSimilarity > 0.7 /* Low for description */
+        );
+      });
+
+      return similarReports.map((report) => {
+        const { titleEmbedding, descriptionEmbedding, ...rest } =
+          report.toObject();
+        return rest;
+      });
+    } catch (error) {
+      console.error(error);
+      return {
+        title: "Error",
+        description:
+          "An error occurred while finding similar reports: " + error,
+      };
+    }
   },
+  loadModel,
+  getModel: () => model,
 };
 
 // Helper function to compute cosine similarity between two tensors
 async function cosineSimilarity(tensor1, tensor2) {
-  const normalized1 = tf.l2Normalize(tensor1, 1);
-  const normalized2 = tf.l2Normalize(tensor2, 1);
+  // Normalize the tensors
+  const norm1 = tf.norm(tensor1, 2, -1, true);
+  const norm2 = tf.norm(tensor2, 2, -1, true);
+  const normalized1 = tensor1.div(norm1);
+  const normalized2 = tensor2.div(norm2);
+
+  // Compute the dot product
   const dotProduct = tf.matMul(normalized1, normalized2, false, true);
-  const similarities = await dotProduct.data();
-  return Array.from(similarities);
+  const similarities = await dotProduct.array();
+
+  return similarities[0];
 }

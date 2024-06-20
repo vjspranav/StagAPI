@@ -9,6 +9,9 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const mongoose = require("mongoose");
 
+// Model
+const { loadModel } = require("./routes/helpers/util");
+
 const DB_NAME = "StagOfficial";
 let dbconfig = {};
 try {
@@ -31,6 +34,10 @@ connection.once("open", function () {
   console.log(
     `MongoDB database connection to db ${DB_NAME} established successfully !`
   );
+});
+
+loadModel().then(() => {
+  console.log("Model loaded successfully");
 });
 
 const indexRouterOld = require("./routes/old/index");

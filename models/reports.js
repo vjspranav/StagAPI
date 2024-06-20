@@ -1,3 +1,4 @@
+const { range } = require("@tensorflow/tfjs-node");
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
@@ -24,9 +25,27 @@ const ReportsSchema = new Schema({
     type: String,
     required: true,
   },
+  titleEmbedding: {
+    type: [Number],
+    required: false,
+  },
+  descriptionEmbedding: {
+    type: [Number],
+    required: false,
+  },
   reportCount: {
     type: Number,
     default: 1,
+  },
+  status: {
+    type: String,
+    required: true,
+    default: "open",
+    range: ["open", "closed"],
+  },
+  fix: {
+    type: String,
+    required: false,
   },
 });
 

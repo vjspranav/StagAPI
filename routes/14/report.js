@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const { findSimilarReports } = require("../helpers/util");
+const { findSimilarReports, getModel } = require("../helpers/util");
 const Reports = require("../../models/reports");
 
 /* GET reports listing. */
@@ -10,7 +10,13 @@ router.get("/", function (req, res, next) {
     if (err) {
       res.status(500).send;
     }
-    res.json(reports);
+    res.json(
+      reports.map((report) => {
+        const { titleEmbedding, descriptionEmbedding, ...rest } =
+          report.toObject();
+        return rest;
+      })
+    );
   });
 });
 
@@ -20,12 +26,18 @@ router.get("/:reportType", function (req, res, next) {
     if (err) {
       res.status(500).send;
     }
-    res.json(reports);
+    res.json(
+      reports.map((report) => {
+        const { titleEmbedding, descriptionEmbedding, ...rest } =
+          report.toObject();
+        return rest;
+      })
+    );
   });
 });
 
 // POST a new report
-router.post("/", function (req, res) {
+router.post("/", async function (req, res) {
   //  check if device, version, reportType, title and description are present in the request
   if (
     !req.body.device ||
@@ -37,14 +49,35 @@ router.post("/", function (req, res) {
     return res.status(400).send("Bad Request");
   }
 
+  const model = getModel();
+
+  // check if reportType is valid
+  if (!["bug", "feature", "other"].includes(req.body.reportType)) {
+    return res.status(400).send("Bad Request");
+  }
+
+  // Encode the input report's title and description
+  const titleEmbedding = await model.embed([req.body.title]);
+  const descriptionEmbedding = await model.embed([req.body.description]);
+
   const newReport = new Reports({
     devices: [req.body.device],
     version: req.body.version,
     reportType: req.body.reportType,
     title: req.body.title,
     description: req.body.description,
+    titleEmbedding: titleEmbedding.arraySync()[0],
+    descriptionEmbedding: descriptionEmbedding.arraySync()[0],
   });
-  newReport.save().then((report) => res.json(report));
+  newReport.save().then((report) =>
+    res.json(
+      report.map((report) => {
+        const { titleEmbedding, descriptionEmbedding, ...rest } =
+          report.toObject();
+        return rest;
+      })
+    )
+  );
 });
 
 // GET similar reports
@@ -60,7 +93,38 @@ router.post("/similar", async function (req, res) {
 
   const similarReports = await findSimilarReports(req.body);
 
+  // if not an array, return the error
+  if (!Array.isArray(similarReports)) {
+    return res.status(500).send(similarReports);
+  }
+
   res.json(similarReports);
+});
+
+// Add a route that takes device and repor id and updates the device array in the report and increments the reportCount
+router.put("/:reportId", async function (req, res) {
+  // check if device is present in the request
+  if (!req.body.device) {
+    return res.status(400).send("Bad Request");
+  }
+
+  Reports.findByIdAndUpdate(
+    req.params.reportId,
+    {
+      $addToSet: { devices: req.body.device },
+      $inc: { reportCount: 1 },
+    },
+    { new: true },
+    function (err, report) {
+      if (err) {
+        res.status(500).send;
+      }
+      // remove title and description embeddings
+      const { titleEmbedding, descriptionEmbedding, ...rest } =
+        report.toObject();
+      res.json(rest);
+    }
+  );
 });
 
 module.exports = router;
