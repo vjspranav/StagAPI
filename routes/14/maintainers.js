@@ -212,7 +212,7 @@ router.post("/apply", (req, res, next) => {
     status,
     name,
     tg_username,
-    version: "13",
+    version: "14",
   });
   newMaintainer
     .save()
