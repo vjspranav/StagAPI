@@ -69,15 +69,16 @@ router.post("/", async function (req, res) {
     titleEmbedding: titleEmbedding.arraySync()[0],
     descriptionEmbedding: descriptionEmbedding.arraySync()[0],
   });
-  newReport.save().then((report) =>
-    res.json(
-      report.map((report) => {
-        const { titleEmbedding, descriptionEmbedding, ...rest } =
-          report.toObject();
-        return rest;
-      })
-    )
-  );
+  newReport
+    .save()
+    .then((report) => {
+      const { titleEmbedding, descriptionEmbedding, ...rest } =
+        report.toObject();
+      res.json(rest);
+    })
+    .catch((err) => {
+      res.status(500).send(err);
+    });
 });
 
 // GET similar reports
