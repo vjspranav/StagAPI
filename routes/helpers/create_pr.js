@@ -149,7 +149,7 @@ const create_pr = async (
   device_company,
   device_codename,
   tg_username,
-  repo_branch = "t13"
+  repo_branch = "u14"
 ) => {
   // Clone https://github.com/StagOS/android_packages_apps_Horns/ s12.1 branch
   let pr_branch = `${repo_branch}-${device_codename}`;

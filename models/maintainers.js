@@ -86,7 +86,7 @@ const MaintainersSchema = new Schema({
   version: {
     type: String,
     required: true,
-    range: ["12", "13"],
+    range: ["12", "13", "14"],
   },
 });
 

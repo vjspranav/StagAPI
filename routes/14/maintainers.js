@@ -75,11 +75,11 @@ router.get("/companies", (req, res, next) => {
     }
     let companies = [];
     maintainers.forEach((maintainer) => {
-      // Check if maintiner.version exists and is not eqal to 13
+      // Check if maintiner.version exists and is not eqal to 14
       if (!maintainer.version) {
         return;
       }
-      if (maintainer.version && maintainer.version !== "13") {
+      if (maintainer.version && maintainer.version !== "14") {
         return;
       }
       maintainer.company = maintainer.device_company.trim();
@@ -241,12 +241,12 @@ router.post("/apply", (req, res, next) => {
 router.get("/all", (req, res, next) => {
   Maintainers.find()
     .then((maintainers) => {
-      // Filter maintainers with version 13
+      // Filter maintainers with version 14
       maintainers = maintainers.filter((maintainer) => {
         if (!maintainer.version) {
           return false;
         }
-        if (maintainer.version && maintainer.version !== "13") {
+        if (maintainer.version && maintainer.version !== "14") {
           return false;
         }
         return true;
@@ -384,7 +384,7 @@ router.get("/:device_code", (req, res) => {
   // Find maintainer with device_code and status Accepted
   Maintainers.findOne({
     device_codename: device_code,
-    version: "13",
+    version: "14",
     status: "Accepted",
   })
     .then((maintainer) => {

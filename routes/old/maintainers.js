@@ -203,6 +203,13 @@ router.post("/apply", (req, res, next) => {
 router.get("/all", (req, res, next) => {
   Maintainers.find()
     .then((maintainers) => {
+      maintainers = maintainers.filter((maintainer) => {
+        if (!maintainer.version || maintainer.version === "12") {
+          return true;
+        }
+        return false;
+      });
+
       return res.json({
         status: 200,
         message: "All maintainers",
