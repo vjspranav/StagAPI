@@ -47,6 +47,14 @@ const ReportsSchema = new Schema({
     type: String,
     required: false,
   },
+  contact: {
+    type: String,
+    required: false,
+  },
+  log: {
+    type: String,
+    required: false,
+  },
 });
 
 module.exports = mongoose.model("Reports", ReportsSchema);

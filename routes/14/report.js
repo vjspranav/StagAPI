@@ -68,6 +68,8 @@ router.post("/", async function (req, res) {
     description: req.body.description,
     titleEmbedding: titleEmbedding.arraySync()[0],
     descriptionEmbedding: descriptionEmbedding.arraySync()[0],
+    contact: req.body.contact || "",
+    log: req.body.log || "",
   });
   newReport
     .save()
