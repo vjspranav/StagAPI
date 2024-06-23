@@ -291,7 +291,7 @@ router.post("/updateStatus", (req, res, next) => {
   const { id, status, pass } = req.body;
   const review = req.body.review || "No reason provided";
   if (pass === password)
-    Maintainers.findByIdAndUpdate(id, { status })
+    Maintainers.findByIdAndUpdate(id, { status, review })
       .then((maintainer) => {
         if (status == "Reviewing") {
           send_email(
